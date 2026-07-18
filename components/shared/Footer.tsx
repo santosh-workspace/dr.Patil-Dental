@@ -16,7 +16,7 @@ export function Footer() {
       />
       <Container className="grid gap-12 py-16 md:grid-cols-2 lg:grid-cols-4">
         <div>
-          <Logo dark />
+          <Logo inverted />
           <p className="mt-5 text-sm leading-body">{clinic.tagline}</p>
           <p className="mt-4 text-sm leading-body">
             {clinic.doctor.name}, {clinic.doctor.degree}

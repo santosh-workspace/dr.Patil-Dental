@@ -7,7 +7,7 @@ import { Menu, Phone, X } from "lucide-react";
 import { navigation } from "@/data/navigation";
 import { clinic, telUrl } from "@/data/clinic";
 import { Container } from "@/components/layout/Container";
-import { ButtonLink } from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 import { Logo } from "./Logo";
 
 /** Sticky classic header: elevates on scroll, drawer nav below desktop. */
@@ -83,9 +83,9 @@ export function Header() {
           >
             <Phone aria-hidden="true" className="h-5 w-5" />
           </a>
-          <ButtonLink href="/contact" className="hidden sm:inline-flex">
+          <Button href="/contact" className="hidden sm:inline-flex">
             Book Appointment
-          </ButtonLink>
+          </Button>
           <button
             type="button"
             aria-expanded={open}
@@ -128,9 +128,9 @@ export function Header() {
               </li>
             ))}
             <li className="pt-2">
-              <ButtonLink href="/contact" className="w-full">
+              <Button href="/contact" className="w-full">
                 Book Appointment
-              </ButtonLink>
+              </Button>
             </li>
           </ul>
         </nav>
