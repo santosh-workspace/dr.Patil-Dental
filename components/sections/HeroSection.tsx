@@ -16,6 +16,19 @@ import { fadeIn } from "@/animations/variants";
 export function HeroSection() {
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-primary-50/60 via-white to-white">
+      {/* Pixabay dental-clinic image softened to support, rather than compete with, the hero copy. */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+        <Image
+          src="/images/hero-dental-clinic-pixabay.jpg"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="scale-105 object-cover opacity-50 blur-md"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/80 to-primary-50/65" />
+      </div>
+
       {/* Soft decorative background — atmosphere without noise (Design System) */}
       <div className="animate-floaty pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-secondary-100/50 blur-3xl" aria-hidden="true" />
       <div className="animate-floaty pointer-events-none absolute -left-24 bottom-0 h-80 w-80 rounded-full bg-primary-100/40 blur-3xl [animation-delay:-3s]" aria-hidden="true" />
