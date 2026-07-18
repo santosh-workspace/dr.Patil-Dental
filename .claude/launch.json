@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dr-patil-dental",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 3000,
+      "cwd": "C:\\Users\\SantoshNagargoje\\Downloads\\Task-Free\\dr-patil-dental"
+    }
+  ]
+}

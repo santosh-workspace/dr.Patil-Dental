@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  body {
+    @apply bg-white font-body text-neutral-800 antialiased;
+    /* Pre-reveal slide-in offsets (translateX ±32px) must never create
+       horizontal scroll; clip avoids making body a scroll container. */
+    overflow-x: clip;
+  }
+
+  ::selection {
+    @apply bg-primary-200 text-primary-950;
+  }
+}
