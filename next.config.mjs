@@ -4,10 +4,7 @@ const nextConfig = {
   poweredByHeader: false,
   images: {
     formats: ["image/avif", "image/webp"],
-    remotePatterns: [
-      { protocol: "https", hostname: "lh3.googleusercontent.com" },
-      { protocol: "https", hostname: "images.pexels.com" },
-    ],
   },
 };
+
 export default nextConfig;
