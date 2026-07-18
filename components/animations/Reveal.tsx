@@ -1,81 +1,43 @@
 "use client";
 
 import { motion, useReducedMotion, type Variants } from "framer-motion";
-import type { ReactNode } from "react";
-import { fade, fadeUp, scaleIn, slideInLeft, slideInRight, staggerContainer } from "./presets";
+import { fadeUp } from "@/animations/variants";
 
-const VARIANTS: Record<string, Variants> = {
-  "fade-up": fadeUp,
-  fade,
-  "scale-in": scaleIn,
-  "slide-left": slideInLeft,
-  "slide-right": slideInRight,
-};
-
-interface RevealProps {
-  children: ReactNode;
-  variant?: keyof typeof VARIANTS;
-  delay?: number;
+/**
+ * Scroll-reveal wrapper (Scroll Animations). Respects prefers-reduced-motion:
+ * when reduced motion is requested, content appears instantly with no transform.
+ */
+export function Reveal({
+  children,
+  variants = fadeUp,
+  className,
+  as = "div",
+  delay = 0,
+}: {
+  children: React.ReactNode;
+  variants?: Variants;
   className?: string;
-}
+  as?: "div" | "section" | "li" | "article";
+  delay?: number;
+}) {
+  const reduce = useReducedMotion();
+  const MotionTag = motion[as];
 
-/** Scroll-entry reveal: animates once, disabled entirely under prefers-reduced-motion. */
-export function Reveal({ children, variant = "fade-up", delay = 0, className }: RevealProps) {
-  const reduced = useReducedMotion();
-  if (reduced) return <div className={className}>{children}</div>;
+  if (reduce) {
+    const Tag = as;
+    return <Tag className={className}>{children}</Tag>;
+  }
 
   return (
-    <motion.div
+    <MotionTag
       className={className}
-      variants={VARIANTS[variant]}
+      variants={variants}
       initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: "-80px" }}
+      whileInView="show"
+      viewport={{ once: true, amount: 0.2 }}
       transition={{ delay }}
     >
       {children}
-    </motion.div>
-  );
-}
-
-interface StaggerProps {
-  children: ReactNode;
-  className?: string;
-}
-
-/** Parent that staggers its <StaggerItem> children on scroll entry. */
-export function Stagger({ children, className }: StaggerProps) {
-  const reduced = useReducedMotion();
-  if (reduced) return <div className={className}>{children}</div>;
-
-  return (
-    <motion.div
-      className={className}
-      variants={staggerContainer}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: "-80px" }}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
-export function StaggerItem({
-  children,
-  className,
-  variant = "fade-up",
-}: {
-  children: ReactNode;
-  className?: string;
-  variant?: keyof typeof VARIANTS;
-}) {
-  const reduced = useReducedMotion();
-  if (reduced) return <div className={className}>{children}</div>;
-
-  return (
-    <motion.div className={className} variants={VARIANTS[variant]}>
-      {children}
-    </motion.div>
+    </MotionTag>
   );
 }

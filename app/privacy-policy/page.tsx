@@ -1,93 +1,69 @@
-import type { Metadata } from "next";
-import { clinic } from "@/data/clinic";
-import { buildMetadata } from "@/lib/seo";
+import { buildMetadata } from "@/lib/metadata";
 import { breadcrumbSchema } from "@/lib/schema";
-import { JsonLd } from "@/components/shared/JsonLd";
-import { Section } from "@/components/layout/Section";
+import { site } from "@/constants/site";
 import { PageHeader } from "@/components/shared/PageHeader";
+import { Section } from "@/components/layout/Section";
+import { JsonLd } from "@/components/shared/JsonLd";
 
-export const metadata: Metadata = buildMetadata({
+export const metadata = buildMetadata({
   title: "Privacy Policy",
-  description: `Privacy policy for the ${clinic.name} website — how we handle the information you share with us.`,
+  description: `Privacy policy for ${site.clinicName} — how we handle the information you share with us.`,
   path: "/privacy-policy",
 });
 
-const crumbs = [
-  { name: "Home", path: "/" },
-  { name: "Privacy Policy", path: "/privacy-policy" },
-];
-
-export default function PrivacyPolicyPage() {
+export default function PrivacyPage() {
   return (
     <>
-      <PageHeader crumbs={crumbs} title="Privacy Policy" />
-
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "Privacy Policy", path: "/privacy-policy" },
+        ])}
+      />
+      <PageHeader
+        title="Privacy Policy"
+        crumbs={[
+          { name: "Home", path: "/" },
+          { name: "Privacy Policy", path: "/privacy-policy" },
+        ]}
+      />
       <Section>
-        <div className="mx-auto max-w-[720px] space-y-8 leading-body text-neutral-700">
-          <section>
-            <h2 className="font-heading text-xl font-bold text-neutral-900">
-              What we collect
-            </h2>
-            <p className="mt-3">
-              When you use the appointment form on this website, we collect the
-              details you choose to share: your name, mobile number, the
-              service you&rsquo;re interested in, and any message you add. We
-              collect nothing else through the form.
+        <div className="mx-auto flex max-w-3xl flex-col gap-6 text-body text-neutral-600">
+          <p>
+            This privacy policy explains how {site.clinicName} handles the information you
+            choose to share with us through this website.
+          </p>
+          <div className="flex flex-col gap-2">
+            <h2 className="text-h4 text-neutral-900">Information we collect</h2>
+            <p>
+              When you submit the appointment or contact form, we receive the details you enter
+              — such as your name, phone number, email and message — so that we can respond and
+              arrange your visit. We do not collect this information for any other purpose.
             </p>
-          </section>
-
-          <section>
-            <h2 className="font-heading text-xl font-bold text-neutral-900">
-              How we use it
-            </h2>
-            <p className="mt-3">
-              Your details are used for one purpose only: to contact you about
-              your appointment request. We do not sell, rent, or share your
-              information with third parties for marketing.
+          </div>
+          <div className="flex flex-col gap-2">
+            <h2 className="text-h4 text-neutral-900">How we use it</h2>
+            <p>
+              Your details are used only to contact you about your enquiry or appointment. We do
+              not sell or share your personal information with third parties for marketing.
             </p>
-          </section>
-
-          <section>
-            <h2 className="font-heading text-xl font-bold text-neutral-900">
-              Calls and WhatsApp
-            </h2>
-            <p className="mt-3">
-              If you contact us by phone or WhatsApp, your communication is
-              handled directly between you and the clinic. WhatsApp messages
-              are subject to WhatsApp&rsquo;s own terms and privacy policy.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="font-heading text-xl font-bold text-neutral-900">
-              Patient records
-            </h2>
-            <p className="mt-3">
-              Clinical records created during your treatment are maintained
-              confidentially at the clinic in line with applicable regulations
-              and professional standards.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="font-heading text-xl font-bold text-neutral-900">
-              Questions
-            </h2>
-            <p className="mt-3">
-              For any privacy-related questions, or to ask us to delete your
-              enquiry details, contact us at{" "}
-              <a
-                href={`mailto:${clinic.email}`}
-                className="font-medium text-primary-700 hover:underline"
-              >
-                {clinic.email}
+          </div>
+          <div className="flex flex-col gap-2">
+            <h2 className="text-h4 text-neutral-900">Contact us</h2>
+            <p>
+              If you have any questions about this policy or your information, contact us at{" "}
+              <a href={site.contact.emailHref} className="font-semibold text-primary-700">
+                {site.contact.email}
               </a>{" "}
-              or call {clinic.phoneDisplay}.
+              or call {site.contact.phone}.
             </p>
-          </section>
+          </div>
+          <p className="text-caption text-neutral-500">
+            This is a general policy template and should be reviewed to reflect your clinic&rsquo;s
+            exact data-handling practices and any applicable local regulations.
+          </p>
         </div>
       </Section>
-      <JsonLd data={breadcrumbSchema(crumbs)} />
     </>
   );
 }

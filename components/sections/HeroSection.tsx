@@ -1,120 +1,93 @@
 import Image from "next/image";
-import type { ReactNode } from "react";
-import { Award, GraduationCap, Anchor, Phone } from "lucide-react";
-import { clinic, telUrl } from "@/data/clinic";
+import { Phone, Calendar, Star, ShieldCheck, Clock } from "lucide-react";
+import { site } from "@/constants/site";
 import { Container } from "@/components/layout/Container";
-import { ButtonLink } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { Reveal } from "@/components/animations/Reveal";
+import { TextReveal } from "@/components/animations/TextReveal";
+import { MagneticButton } from "@/components/ui/MagneticButton";
+import { fadeIn } from "@/animations/variants";
 
 /**
- * Server-rendered hero with CSS-only entrance animation: the H1 (LCP
- * element) paints before hydration, and `motion-safe` keeps everything
- * fully visible under prefers-reduced-motion. Auto-upgrades to Classic
- * Split (text left, portrait right) when clinic.doctor.photo is set.
+ * Hero Variant 01 — Classic Split (Generator: "Doctor Photo Available → Split
+ * Hero"). Left: H1 + tagline + CTAs + trust indicators. Right: doctor image.
+ * Single H1 per page (SEO). Fade motion (Generator mapping: Hero → Fade).
  */
-
-/** Staggered fade-up that never hides content from non-animating contexts. */
-function Rise({ delay, children }: { delay: number; children: ReactNode }) {
-  return (
-    <div
-      className="motion-safe:animate-rise"
-      style={{ animationDelay: `${delay}ms` }}
-    >
-      {children}
-    </div>
-  );
-}
-
 export function HeroSection() {
-  const hasPhoto = Boolean(clinic.doctor.photo);
-
-  const content = (
-    <>
-      <Rise delay={0}>
-        <h1
-          id="hero-heading"
-          className="font-heading text-4xl font-bold tracking-tight text-neutral-900 sm:text-5xl lg:text-[3.4rem] lg:leading-[1.1]"
-        >
-          Trusted Family Dentist &amp;{" "}
-          <span className="bg-gradient-to-r from-primary-700 to-aqua-600 bg-clip-text text-transparent">
-            Implant Centre
-          </span>{" "}
-          in Moshi, Pune
-        </h1>
-      </Rise>
-      <Rise delay={120}>
-        <p className="mx-auto mt-6 max-w-xl text-lg leading-body text-neutral-600">
-          Gentle, honest dental care for your whole family — from a child&rsquo;s
-          first check-up to advanced dental implants, right here on Alandi–Moshi Road.
-        </p>
-      </Rise>
-      <Rise delay={240}>
-        <div className={`mt-9 flex flex-col items-center gap-3 sm:flex-row ${hasPhoto ? "" : "justify-center"}`}>
-          <ButtonLink href="/contact" size="lg" className="w-full sm:w-auto">
-            Book Appointment
-          </ButtonLink>
-          <ButtonLink href={telUrl} variant="secondary" size="lg" className="w-full sm:w-auto">
-            <Phone aria-hidden="true" className="h-4 w-4" />
-            Call Now
-          </ButtonLink>
-        </div>
-      </Rise>
-      <Rise delay={360}>
-        <div className={`mt-10 flex flex-wrap items-center gap-3 ${hasPhoto ? "" : "justify-center"}`}>
-          <Badge>
-            <Award aria-hidden="true" className="h-3.5 w-3.5" />
-            {clinic.doctor.experience} Experience
-          </Badge>
-          <Badge>
-            <GraduationCap aria-hidden="true" className="h-3.5 w-3.5" />
-            {clinic.doctor.degree}
-          </Badge>
-          <Badge tone="mint">
-            <Anchor aria-hidden="true" className="h-3.5 w-3.5" />
-            Dedicated Implant Centre
-          </Badge>
-        </div>
-      </Rise>
-    </>
-  );
-
   return (
-    <section
-      aria-labelledby="hero-heading"
-      className="relative overflow-hidden bg-gradient-to-b from-primary-50 via-mint-50/60 to-white"
-    >
-      {/* Layered gradient mesh — soft blobs drifting slowly for gentle depth */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-32 right-[-10%] h-[28rem] w-[28rem] rounded-full bg-primary-100/70 blur-3xl motion-safe:animate-float-slow" />
-        <div className="absolute bottom-[-30%] left-[-12%] h-[26rem] w-[26rem] rounded-full bg-mint-200/50 blur-3xl motion-safe:animate-float-slower" />
-        <div className="absolute left-1/2 top-[-20%] h-72 w-[42rem] -translate-x-1/2 rounded-full bg-white/60 blur-3xl" />
-        <div className="absolute right-[16%] top-24 hidden h-24 w-24 rounded-full border border-primary-200/60 lg:block" />
-        <div className="absolute left-[12%] top-1/2 hidden h-3 w-3 rounded-full bg-aqua-400/40 lg:block" />
-      </div>
-      <Container className="relative py-20 md:py-28 lg:py-32">
-        {hasPhoto ? (
-          <div className="grid items-center gap-12 lg:grid-cols-12">
-            <div className="lg:col-span-7">{content}</div>
-            <div className="relative lg:col-span-5">
-              <Image
-                src={clinic.doctor.photo!}
-                alt={`${clinic.doctor.name}, ${clinic.doctor.degree}, at ${clinic.shortName}`}
-                width={520}
-                height={650}
-                priority
-                className="w-full rounded-card object-cover shadow-lift"
-              />
-            </div>
-          </div>
-        ) : (
-          <div className="mx-auto max-w-[720px] text-center">{content}</div>
-        )}
-        {/* Scroll cue — decorative; static under reduced motion, hidden on short screens */}
-        <div aria-hidden="true" className="mt-14 hidden justify-center md:flex">
-          <span className="flex h-10 w-6 items-start justify-center rounded-full border-2 border-primary-300/80 pt-1.5">
-            <span className="h-2 w-1 rounded-full bg-primary-500 motion-safe:animate-cue-bounce" />
+    <section className="relative overflow-hidden bg-gradient-to-b from-primary-50/60 via-white to-white">
+      {/* Soft decorative background — atmosphere without noise (Design System) */}
+      <div className="animate-floaty pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-secondary-100/50 blur-3xl" aria-hidden="true" />
+      <div className="animate-floaty pointer-events-none absolute -left-24 bottom-0 h-80 w-80 rounded-full bg-primary-100/40 blur-3xl [animation-delay:-3s]" aria-hidden="true" />
+
+      <Container className="relative grid items-center gap-12 py-16 md:py-24 lg:grid-cols-2">
+        <Reveal variants={fadeIn} className="flex flex-col items-start gap-6">
+          <span className="eyebrow">
+            <Star className="h-3.5 w-3.5" aria-hidden="true" />
+            Trusted Dental Care in Moshi, Pune
           </span>
-        </div>
+
+          <TextReveal
+            text="Healthy Smiles, Gentle Care for Your Whole Family"
+            as="h1"
+            className="text-h1"
+            highlight="Gentle Care"
+          />
+
+          <p className="max-w-xl text-body-lg text-neutral-600">
+            {site.tagline}. At {site.clinicName}, {site.doctor.name} offers comfortable,
+            honest dental treatment with {site.doctor.experience} of experience —
+            in a calm, welcoming clinic.
+          </p>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <MagneticButton>
+              <Button href="/contact" size="lg">
+                <Calendar className="h-5 w-5" aria-hidden="true" />
+                Book Appointment
+              </Button>
+            </MagneticButton>
+            <Button href={site.contact.phoneHref} variant="secondary" size="lg">
+              <Phone className="h-5 w-5" aria-hidden="true" />
+              Call Now
+            </Button>
+          </div>
+
+          {/* Trust indicators */}
+          <ul className="flex flex-wrap gap-x-6 gap-y-3 pt-2">
+            <li className="inline-flex items-center gap-2 text-body-sm font-medium text-neutral-700">
+              <ShieldCheck className="h-5 w-5 text-primary-600" aria-hidden="true" />
+              B.D.S. Qualified
+            </li>
+            <li className="inline-flex items-center gap-2 text-body-sm font-medium text-neutral-700">
+              <Star className="h-5 w-5 text-primary-600" aria-hidden="true" />
+              {site.doctor.experience} Experience
+            </li>
+            <li className="inline-flex items-center gap-2 text-body-sm font-medium text-neutral-700">
+              <Clock className="h-5 w-5 text-primary-600" aria-hidden="true" />
+              Open 6 Days a Week
+            </li>
+          </ul>
+        </Reveal>
+
+        <Reveal variants={fadeIn} delay={0.1} className="relative">
+          <div className="absolute -inset-4 -z-10 rounded-[2rem] bg-gradient-to-br from-primary-100 to-secondary-100" aria-hidden="true" />
+          <div className="relative mx-auto aspect-[4/5] w-full max-w-md overflow-hidden rounded-[1.75rem] border border-white shadow-xl">
+            <Image
+              src={site.doctor.photo}
+              alt={`${site.doctor.name}, ${site.doctor.qualification}, at ${site.clinicName}`}
+              fill
+              priority
+              sizes="(max-width: 1024px) 90vw, 440px"
+              className="object-cover"
+            />
+          </div>
+          {/* Floating credential chip */}
+          <div className="absolute bottom-5 left-5 rounded-xl border border-neutral-100 bg-white/95 px-4 py-3 shadow-lg backdrop-blur">
+            <p className="text-body-sm font-bold text-neutral-900">{site.doctor.name}</p>
+            <p className="text-caption text-primary-600">{site.doctor.qualification}</p>
+          </div>
+        </Reveal>
       </Container>
     </section>
   );

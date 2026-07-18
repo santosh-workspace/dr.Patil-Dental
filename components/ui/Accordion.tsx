@@ -1,54 +1,63 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useState, useId } from "react";
 import { ChevronDown } from "lucide-react";
-import type { ServiceFaq } from "@/data/services";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { cn } from "@/lib/utils";
+import type { FAQ } from "@/types/faq";
 
-/** Accessible single-column FAQ accordion with smooth expand/collapse. */
-export function Accordion({ items }: { items: ServiceFaq[] }) {
+/**
+ * Accordion — accessible disclosure list (WCAG 2.2 AA). Each header is a real
+ * <button> with aria-expanded / aria-controls; panels animate with reduced-motion
+ * support. Used for the FAQ section (FAQAccordion).
+ */
+export function Accordion({ items }: { items: FAQ[] }) {
   const [open, setOpen] = useState<number | null>(0);
+  const reduce = useReducedMotion();
   const baseId = useId();
 
   return (
-    <div className="divide-y divide-neutral-200 rounded-card border border-neutral-200 bg-white shadow-soft">
+    <div className="divide-y divide-neutral-200 overflow-hidden rounded-xl border border-neutral-200 bg-neutral-0">
       {items.map((item, i) => {
         const isOpen = open === i;
-        const headerId = `${baseId}-h-${i}`;
-        const panelId = `${baseId}-p-${i}`;
+        const btnId = `${baseId}-btn-${i}`;
+        const panelId = `${baseId}-panel-${i}`;
         return (
-          <div key={item.question}>
-            <h3>
+          <div key={i}>
+            <h3 className="m-0">
               <button
-                type="button"
-                id={headerId}
+                id={btnId}
                 aria-expanded={isOpen}
                 aria-controls={panelId}
                 onClick={() => setOpen(isOpen ? null : i)}
-                className="flex min-h-[44px] w-full items-center justify-between gap-4 px-6 py-5 text-left font-heading text-base font-semibold text-neutral-900 transition-colors hover:bg-primary-50/50 hover:text-primary-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-primary-600 md:text-lg"
+                className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left text-body font-semibold text-neutral-900 transition-colors hover:bg-primary-50/50"
               >
-                {item.question}
+                <span>{item.question}</span>
                 <ChevronDown
+                  className={cn(
+                    "h-5 w-5 shrink-0 text-primary-600 transition-transform duration-300",
+                    isOpen && "rotate-180"
+                  )}
                   aria-hidden="true"
-                  className={`h-5 w-5 shrink-0 text-primary-600 transition-transform duration-300 motion-reduce:transition-none ${
-                    isOpen ? "rotate-180" : ""
-                  }`}
                 />
               </button>
             </h3>
-            <div
-              id={panelId}
-              role="region"
-              aria-labelledby={headerId}
-              className={`grid transition-[grid-template-rows] duration-300 ease-out motion-reduce:transition-none ${
-                isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
-              }`}
-            >
-              <div className="overflow-hidden">
-                <p className="px-6 pb-5 leading-body text-neutral-600">
-                  {item.answer}
-                </p>
-              </div>
-            </div>
+            <AnimatePresence initial={false}>
+              {isOpen && (
+                <motion.div
+                  id={panelId}
+                  role="region"
+                  aria-labelledby={btnId}
+                  initial={reduce ? undefined : { height: 0, opacity: 0 }}
+                  animate={reduce ? undefined : { height: "auto", opacity: 1 }}
+                  exit={reduce ? undefined : { height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                  className="overflow-hidden"
+                >
+                  <p className="px-5 pb-5 text-body-sm text-neutral-600">{item.answer}</p>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         );
       })}

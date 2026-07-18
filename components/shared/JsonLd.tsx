@@ -1,13 +1,13 @@
-/** Injects a JSON-LD structured-data block into the page. */
+/** Injects validated JSON-LD structured data (Schema System). */
 export function JsonLd({ data }: { data: object | object[] }) {
-  const items = Array.isArray(data) ? data : [data];
+  const payload = Array.isArray(data) ? data : [data];
   return (
     <>
-      {items.map((item, i) => (
+      {payload.map((d, i) => (
         <script
           key={i}
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(d) }}
         />
       ))}
     </>

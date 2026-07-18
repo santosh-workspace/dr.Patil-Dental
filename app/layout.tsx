@@ -1,55 +1,52 @@
-import type { Metadata } from "next";
-import { Manrope, Inter } from "next/font/google";
-import { clinic } from "@/data/clinic";
-import { metadataBase } from "@/lib/seo";
-import { dentistSchema, websiteSchema } from "@/lib/schema";
-import { JsonLd } from "@/components/shared/JsonLd";
-import { Header } from "@/components/shared/Header";
-import { Footer } from "@/components/shared/Footer";
-import { FloatingContactActions } from "@/components/shared/FloatingContactActions";
+import type { Metadata, Viewport } from "next";
+import { Plus_Jakarta_Sans, Manrope } from "next/font/google";
 import "./globals.css";
+import { site } from "@/constants/site";
+import { buildMetadata } from "@/lib/metadata";
+import { Header } from "@/components/navigation/Header";
+import { Footer } from "@/components/navigation/Footer";
+import { FloatingActions } from "@/components/shared/FloatingActions";
+import { JsonLd } from "@/components/shared/JsonLd";
+import { dentistSchema, organizationSchema, websiteSchema } from "@/lib/schema";
 
-const heading = Manrope({
+/* next/font — self-hosted, no layout shift, no render-blocking (Performance). */
+const heading = Plus_Jakarta_Sans({
   subsets: ["latin"],
+  weight: ["600", "700", "800"],
   variable: "--font-heading",
   display: "swap",
-  weight: ["600", "700", "800"],
 });
-
-const body = Inter({
+const body = Manrope({
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-body",
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  metadataBase,
-  title: {
-    default: `Dentist in Moshi | ${clinic.shortName}`,
-    template: `%s | ${clinic.shortName}`,
-  },
-  description: clinic.tagline,
+export const metadata: Metadata = buildMetadata({
+  title: site.clinicName,
+  description: `${site.clinicName} — gentle, trusted dental care by ${site.doctor.name} (${site.doctor.qualification}) in Moshi, Pimpri-Chinchwad, Pune. Book your appointment today.`,
+  path: "/",
+});
+
+export const viewport: Viewport = {
+  themeColor: "#2563eb",
+  width: "device-width",
+  initialScale: 1,
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${heading.variable} ${body.variable}`}>
+    <html lang="en-IN" className={`${heading.variable} ${body.variable}`}>
       <body>
-        <a
-          href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-primary-700 focus:px-5 focus:py-3 focus:text-sm focus:font-semibold focus:text-white"
-        >
-          Skip to main content
-        </a>
+        {/* Global structured data — Schema System */}
+        <JsonLd data={[dentistSchema(), organizationSchema(), websiteSchema()]} />
+
+        <a href="#main" className="skip-link">Skip to content</a>
         <Header />
-        <main id="main-content">{children}</main>
+        <main id="main">{children}</main>
         <Footer />
-        <FloatingContactActions />
-        <JsonLd data={[dentistSchema(), websiteSchema()]} />
+        <FloatingActions />
       </body>
     </html>
   );

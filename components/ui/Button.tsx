@@ -1,96 +1,89 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 
-type ButtonVariant = "primary" | "secondary" | "ghost" | "inverse";
-type ButtonSize = "md" | "lg";
+/**
+ * Button — supports the documented variants (Primary, Secondary, Ghost,
+ * Gradient), sizes, loading, disabled, icon, and full width (Component Rules
+ * "Buttons"). Renders as <a>/<Link> when href is provided, else <button>.
+ */
+type Variant = "primary" | "secondary" | "ghost" | "gradient";
+type Size = "sm" | "md" | "lg";
 
-const VARIANTS: Record<ButtonVariant, string> = {
+const base =
+  "inline-flex items-center justify-center gap-2 font-body font-semibold rounded-lg transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:opacity-60 disabled:pointer-events-none";
+
+const variants: Record<Variant, string> = {
   primary:
-    "bg-primary-600 text-white shadow-soft hover:bg-primary-700 hover:shadow-glow motion-safe:hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0",
+    "btn-sheen bg-primary-600 text-white shadow-md hover:bg-primary-700 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]",
   secondary:
-    "border-2 border-primary-600 text-primary-700 hover:bg-primary-50 motion-safe:hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0",
-  ghost: "text-primary-700 hover:bg-primary-50 active:scale-[0.98]",
-  inverse:
-    "bg-white text-primary-700 shadow-soft hover:bg-primary-50 hover:shadow-lift motion-safe:hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0",
+    "bg-primary-50 text-primary-700 hover:bg-primary-100 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]",
+  ghost: "text-primary-700 hover:bg-primary-50",
+  gradient:
+    "btn-sheen bg-gradient-to-r from-primary-600 to-secondary-500 text-white shadow-md hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]",
 };
 
-const SIZES: Record<ButtonSize, string> = {
-  md: "px-6 py-3 text-sm",
-  lg: "px-8 py-4 text-base",
+const sizes: Record<Size, string> = {
+  sm: "text-body-sm px-4 py-2",
+  md: "text-body px-5 py-2.5",
+  lg: "text-body px-7 py-3.5",
 };
 
-const BASE =
-  "inline-flex min-h-[44px] items-center justify-center gap-2 rounded-button font-semibold tracking-wide transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 disabled:pointer-events-none disabled:opacity-50";
-
-interface ButtonBaseProps {
-  variant?: ButtonVariant;
-  size?: ButtonSize;
+interface CommonProps {
+  variant?: Variant;
+  size?: Size;
+  fullWidth?: boolean;
+  loading?: boolean;
   className?: string;
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
-interface ButtonLinkProps extends ButtonBaseProps {
+type ButtonProps = CommonProps &
+  React.ButtonHTMLAttributes<HTMLButtonElement> & { href?: undefined };
+type AnchorProps = CommonProps & {
   href: string;
   external?: boolean;
-  ariaLabel?: string;
-}
+  "aria-label"?: string;
+};
 
-export function ButtonLink({
-  href,
-  variant = "primary",
-  size = "md",
-  className = "",
-  external = false,
-  ariaLabel,
-  children,
-}: ButtonLinkProps) {
-  const cls = `${BASE} ${VARIANTS[variant]} ${SIZES[size]} ${className}`;
-  if (external || href.startsWith("tel:") || href.startsWith("http")) {
+export function Button(props: ButtonProps | AnchorProps) {
+  const {
+    variant = "primary",
+    size = "md",
+    fullWidth,
+    loading,
+    className,
+    children,
+  } = props;
+
+  const classes = cn(base, variants[variant], sizes[size], fullWidth && "w-full", className);
+
+  if ("href" in props && props.href) {
+    const { external, ...rest } = props as AnchorProps;
+    if (external) {
+      return (
+        <a
+          href={props.href}
+          className={classes}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={rest["aria-label"]}
+        >
+          {children}
+        </a>
+      );
+    }
     return (
-      <a
-        href={href}
-        className={cls}
-        aria-label={ariaLabel}
-        {...(href.startsWith("http")
-          ? { target: "_blank", rel: "noopener noreferrer" }
-          : {})}
-      >
+      <Link href={props.href} className={classes} aria-label={rest["aria-label"]}>
         {children}
-      </a>
+      </Link>
     );
   }
-  return (
-    <Link href={href} className={cls} aria-label={ariaLabel}>
-      {children}
-    </Link>
-  );
-}
 
-interface ButtonProps extends ButtonBaseProps {
-  type?: "button" | "submit";
-  loading?: boolean;
-  disabled?: boolean;
-  onClick?: () => void;
-}
-
-export function Button({
-  type = "button",
-  variant = "primary",
-  size = "md",
-  className = "",
-  loading = false,
-  disabled = false,
-  onClick,
-  children,
-}: ButtonProps) {
+  const { variant: _v, size: _s, fullWidth: _f, loading: _l, children: _c, ...buttonProps } =
+    props as ButtonProps;
   return (
-    <button
-      type={type}
-      onClick={onClick}
-      disabled={disabled || loading}
-      className={`${BASE} ${VARIANTS[variant]} ${SIZES[size]} ${className}`}
-    >
+    <button className={classes} disabled={loading || buttonProps.disabled} {...buttonProps}>
       {loading && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
       {children}
     </button>

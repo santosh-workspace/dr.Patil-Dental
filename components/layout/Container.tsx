@@ -1,15 +1,12 @@
-import type { ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
+/** Container — controls max width + horizontal padding only (Layout Components). */
 export function Container({
   children,
-  className = "",
+  className,
 }: {
-  children: ReactNode;
+  children: React.ReactNode;
   className?: string;
 }) {
-  return (
-    <div className={`mx-auto w-full max-w-site px-4 sm:px-6 lg:px-8 ${className}`}>
-      {children}
-    </div>
-  );
+  return <div className={cn("container-page", className)}>{children}</div>;
 }

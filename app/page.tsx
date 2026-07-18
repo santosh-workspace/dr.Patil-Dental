@@ -1,48 +1,40 @@
-import type { Metadata } from "next";
-import { buildMetadata } from "@/lib/seo";
-import { faqSchema } from "@/lib/schema";
-import { homeFaqs } from "@/data/faqs";
-import { JsonLd } from "@/components/shared/JsonLd";
 import { HeroSection } from "@/components/sections/HeroSection";
-import { TrustBadgesSection } from "@/components/sections/TrustBadgesSection";
+import { TrustBadges } from "@/components/sections/TrustBadges";
 import { AboutSection } from "@/components/sections/AboutSection";
 import { ServicesSection } from "@/components/sections/ServicesSection";
-import { FeaturedImplantsSection } from "@/components/sections/FeaturedImplantsSection";
+import { WhyChooseUs } from "@/components/sections/WhyChooseUs";
 import { DoctorSection } from "@/components/sections/DoctorSection";
 import { TechnologySection } from "@/components/sections/TechnologySection";
 import { GallerySection } from "@/components/sections/GallerySection";
-import { StatisticsSection } from "@/components/sections/StatisticsSection";
-import { TestimonialsSection } from "@/components/sections/TestimonialsSection";
-import { FaqSection } from "@/components/sections/FaqSection";
-import { CtaSection } from "@/components/sections/CtaSection";
+import { ReviewsSection } from "@/components/sections/ReviewsSection";
+import { FAQSection } from "@/components/sections/FAQSection";
+import { AppointmentCTA } from "@/components/sections/AppointmentCTA";
 import { ContactSection } from "@/components/sections/ContactSection";
-import { MapSection } from "@/components/sections/MapSection";
+import { JsonLd } from "@/components/shared/JsonLd";
+import { faqSchema, servicesSchema } from "@/lib/schema";
 
-export const metadata: Metadata = buildMetadata({
-  title: "Dentist in Moshi | Dr. Patil's Dental Clinic",
-  description:
-    "Trusted dentist in Moshi, Pune — gentle family dental care and a dedicated implant centre led by Dr. Priyanka Patil, BDS. Book an appointment today.",
-  path: "/",
-});
-
+/**
+ * Homepage — Standard Homepage Structure (Section Library):
+ * Hero → Trust Badges → About → Services → Why Choose Us → Doctor →
+ * Technology → Gallery → Reviews → FAQ → Appointment CTA → Contact.
+ * (Header / Footer / Floating actions live in the root layout.)
+ */
 export default function HomePage() {
   return (
     <>
+      <JsonLd data={[servicesSchema(), faqSchema()]} />
       <HeroSection />
-      <TrustBadgesSection />
+      <TrustBadges />
       <AboutSection />
-      <ServicesSection />
-      <FeaturedImplantsSection />
+      <ServicesSection limit={8} />
+      <WhyChooseUs />
       <DoctorSection />
       <TechnologySection />
       <GallerySection />
-      <StatisticsSection />
-      <TestimonialsSection />
-      <FaqSection faqs={homeFaqs} />
-      <CtaSection />
+      <ReviewsSection />
+      <FAQSection />
+      <AppointmentCTA />
       <ContactSection />
-      <MapSection />
-      <JsonLd data={faqSchema(homeFaqs)} />
     </>
   );
 }

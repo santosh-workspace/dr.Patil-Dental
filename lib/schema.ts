@@ -1,64 +1,109 @@
-import { clinic, areasServed } from "@/data/clinic";
-import type { Service, ServiceFaq } from "@/data/services";
-import { SITE_URL, absoluteUrl } from "./site";
+import { site } from "@/constants/site";
+import { services } from "@/data/services";
+import { faqs } from "@/data/faq";
+import { reviews } from "@/data/reviews";
 
 /**
- * JSON-LD builders per the SEO plan. Review/AggregateRating schema is
- * intentionally absent until verified GBP data is supplied (YMYL rule:
- * never fabricate ratings).
+ * Structured data — Schema System. Emitted as validated JSON-LD.
+ * NOTE: Review and AggregateRating schema are deliberately NOT generated,
+ * because no genuine review data was supplied (Content Rules forbid
+ * fabricating reviews/ratings). Add them only with real, verifiable reviews.
  */
 
-const postalAddress = {
-  "@type": "PostalAddress",
-  streetAddress: `${clinic.address.shop}, ${clinic.address.society}, ${clinic.address.road}, ${clinic.address.landmark}`,
-  addressLocality: `${clinic.address.area}, ${clinic.address.city}`,
-  addressRegion: clinic.address.state,
-  postalCode: clinic.address.pincode,
-  addressCountry: "IN",
-};
+const openingHours = site.hours
+  .filter((h) => h.morning !== "Closed")
+  .map((h) => ({
+    day: h.day.slice(0, 2),
+    morning: h.morning,
+    evening: h.evening,
+  }));
 
+// Dentist is a subtype of LocalBusiness/MedicalBusiness — covers both.
 export function dentistSchema() {
+  // Only emit rating/review schema from GENUINE reviews (never fabricated).
+  const ratingSchema =
+    reviews.length > 0
+      ? {
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: (
+              reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+            ).toFixed(1),
+            reviewCount: reviews.length,
+          },
+          review: reviews.map((r) => ({
+            "@type": "Review",
+            author: { "@type": "Person", name: r.name },
+            reviewRating: { "@type": "Rating", ratingValue: r.rating, bestRating: 5 },
+            reviewBody: r.text,
+            ...(r.date ? { datePublished: r.date } : {}),
+          })),
+        }
+      : {};
+
   return {
     "@context": "https://schema.org",
-    "@type": ["Dentist", "LocalBusiness"],
-    "@id": `${SITE_URL}#clinic`,
-    name: clinic.name,
-    description: clinic.tagline,
-    url: SITE_URL,
-    telephone: clinic.phone,
-    email: clinic.email,
-    address: postalAddress,
-    areaServed: areasServed.map((name) => ({ "@type": "Place", name })),
-    ...(clinic.gbpUrl ? { sameAs: [clinic.gbpUrl] } : {}),
-    ...(clinic.hours
-      ? {
-          openingHours: clinic.hours.map((h) => `${h.days} ${h.time}`),
-        }
-      : {}),
-    contactPoint: {
-      "@type": "ContactPoint",
-      telephone: clinic.phone,
-      contactType: "appointments",
-      availableLanguage: ["English", "Hindi", "Marathi"],
+    "@type": "Dentist",
+    "@id": `${site.url}/#dentist`,
+    name: site.clinicName,
+    description: `${site.clinicName} — dental care by ${site.doctor.name}, ${site.doctor.qualification}, ${site.doctor.experience} experience, in Moshi, Pimpri-Chinchwad, Pune.`,
+    url: site.url,
+    telephone: site.contact.phone,
+    email: site.contact.email,
+    image: site.doctor.photo,
+    priceRange: "₹₹",
+    ...ratingSchema,
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: `${site.address.line1}, ${site.address.line2}`,
+      addressLocality: site.address.city,
+      addressRegion: site.address.state,
+      postalCode: site.address.postalCode,
+      addressCountry: site.address.country,
+    },
+    hasMap: site.maps.googleBusinessProfile,
+    areaServed: site.serviceAreas.map((a) => ({ "@type": "City", name: a })),
+    openingHoursSpecification: [
+      {
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: openingHours.map(
+          (h) =>
+            ({ Mo: "Monday", Tu: "Tuesday", We: "Wednesday", Th: "Thursday", Fr: "Friday", Sa: "Saturday" } as Record<string, string>)[h.day]
+        ),
+        opens: "10:30",
+        closes: "12:00",
+      },
+      {
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+        opens: "18:30",
+        closes: "21:30",
+      },
+    ],
+    employee: {
+      "@type": "Person",
+      name: site.doctor.name,
+      jobTitle: "Dentist",
+      description: `${site.doctor.qualification} (Reg. ${site.doctor.registration})`,
     },
   };
 }
 
-export function personSchema() {
+export function organizationSchema() {
   return {
     "@context": "https://schema.org",
-    "@type": "Person",
-    "@id": `${SITE_URL}#doctor`,
-    name: clinic.doctor.name,
-    jobTitle: "Dental Surgeon",
-    honorificSuffix: clinic.doctor.degree,
-    identifier: {
-      "@type": "PropertyValue",
-      name: "Dental Council Registration Number",
-      value: clinic.doctor.regNo,
+    "@type": "Organization",
+    "@id": `${site.url}/#organization`,
+    name: site.clinicName,
+    url: site.url,
+    logo: `${site.url}/logos/logo.png`,
+    contactPoint: {
+      "@type": "ContactPoint",
+      telephone: site.contact.phone,
+      contactType: "customer service",
+      areaServed: "IN",
+      availableLanguage: ["en", "hi", "mr"],
     },
-    worksFor: { "@id": `${SITE_URL}#clinic` },
-    url: absoluteUrl("/doctor"),
   };
 }
 
@@ -66,25 +111,14 @@ export function websiteSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "@id": `${SITE_URL}#website`,
-    name: clinic.name,
-    url: SITE_URL,
-    publisher: { "@id": `${SITE_URL}#clinic` },
+    "@id": `${site.url}/#website`,
+    url: site.url,
+    name: site.clinicName,
+    inLanguage: "en-IN",
   };
 }
 
-export function serviceSchema(service: Service) {
-  return {
-    "@context": "https://schema.org",
-    "@type": "MedicalProcedure",
-    name: service.name,
-    description: service.shortDescription,
-    url: absoluteUrl(`/services/${service.slug}`),
-    provider: { "@id": `${SITE_URL}#clinic` },
-  };
-}
-
-export function faqSchema(faqs: ServiceFaq[]) {
+export function faqSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -96,15 +130,32 @@ export function faqSchema(faqs: ServiceFaq[]) {
   };
 }
 
+export function servicesSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    itemListElement: services.map((s, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      item: {
+        "@type": "Service",
+        name: s.title,
+        description: s.short,
+        provider: { "@type": "Dentist", name: site.clinicName },
+      },
+    })),
+  };
+}
+
 export function breadcrumbSchema(items: { name: string; path: string }[]) {
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
-    itemListElement: items.map((item, i) => ({
+    itemListElement: items.map((it, i) => ({
       "@type": "ListItem",
       position: i + 1,
-      name: item.name,
-      item: absoluteUrl(item.path),
+      name: it.name,
+      item: `${site.url}${it.path}`,
     })),
   };
 }

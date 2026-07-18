@@ -1,35 +1,34 @@
-import type { Metadata } from "next";
-import { buildMetadata } from "@/lib/seo";
+import { buildMetadata } from "@/lib/metadata";
 import { breadcrumbSchema } from "@/lib/schema";
-import { JsonLd } from "@/components/shared/JsonLd";
+import { site } from "@/constants/site";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { ContactSection } from "@/components/sections/ContactSection";
-import { MapSection } from "@/components/sections/MapSection";
+import { JsonLd } from "@/components/shared/JsonLd";
 
-export const metadata: Metadata = buildMetadata({
+export const metadata = buildMetadata({
   title: "Contact & Appointments",
-  description:
-    "Book a dental appointment in Moshi — call +91 86682 52402, WhatsApp us, or send a request. Dr. Patil's Dental Clinic, Alandi–Moshi Road, opp. Chaudhary Dhaba.",
+  description: `Contact ${site.clinicName} in Moshi, Pimpri-Chinchwad, Pune. Call ${site.contact.phone}, WhatsApp us, or request an appointment online.`,
   path: "/contact",
 });
-
-const crumbs = [
-  { name: "Home", path: "/" },
-  { name: "Contact", path: "/contact" },
-];
 
 export default function ContactPage() {
   return (
     <>
-      <PageHeader
-        crumbs={crumbs}
-        title="Contact Us"
-        lede="Call, WhatsApp, or request an appointment online — whichever is easiest for you."
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "Contact", path: "/contact" },
+        ])}
       />
-
+      <PageHeader
+        title="Contact & Appointments"
+        subtitle={`${site.tagline}. We'd love to help — reach out any time during clinic hours.`}
+        crumbs={[
+          { name: "Home", path: "/" },
+          { name: "Contact", path: "/contact" },
+        ]}
+      />
       <ContactSection />
-      <MapSection />
-      <JsonLd data={breadcrumbSchema(crumbs)} />
     </>
   );
 }

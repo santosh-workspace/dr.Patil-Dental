@@ -1,99 +1,82 @@
-import { Clock, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
-import { clinic, telUrl, whatsappUrl } from "@/data/clinic";
+import { site } from "@/constants/site";
 import { Section } from "@/components/layout/Section";
-import { SectionHeading } from "@/components/ui/SectionHeading";
+import { SectionHeading } from "@/components/shared/SectionHeading";
+import { GoogleMap } from "@/components/shared/GoogleMap";
+import { BusinessHours } from "@/components/shared/BusinessHours";
 import { AppointmentForm } from "@/components/forms/AppointmentForm";
+import { Card } from "@/components/ui/Card";
 import { Reveal } from "@/components/animations/Reveal";
+import { Phone, Mail, MapPin, Clock } from "lucide-react";
 
-/** Split contact: NAP + hours + channels on the left, appointment form on the right. */
-export function ContactSection() {
+/** Contact Section — info + hours + map + appointment form (Contact Page rules). */
+export function ContactSection({ withForm = true }: { withForm?: boolean }) {
   return (
-    <Section labelledBy="contact-heading" id="contact">
-      <SectionHeading
-        id="contact-heading"
-        eyebrow="Get in Touch"
-        title="Book your appointment"
-        description="Call, WhatsApp, or send a request — we'll confirm a time that suits you."
-      />
-      <div className="grid gap-12 lg:grid-cols-2">
-        <Reveal variant="slide-left">
-          <ul className="space-y-6">
-            <li className="flex gap-4">
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary-50 text-primary-600">
-                <MapPin aria-hidden="true" className="h-5 w-5" />
+    <Section id="contact">
+      <Reveal className="mb-12">
+        <SectionHeading
+          eyebrow="Contact & Appointments"
+          title="Visit us or book online"
+          subtitle="We're easy to reach in Moshi, Pimpri-Chinchwad. Reach out any time during clinic hours."
+        />
+      </Reveal>
+
+      <div className="grid gap-8 lg:grid-cols-2">
+        <Reveal className="flex flex-col gap-6">
+          <Card className="flex flex-col gap-4">
+            <ContactRow icon={<Phone className="h-5 w-5" />} label="Phone / WhatsApp" value={site.contact.phone} href={site.contact.phoneHref} />
+            <ContactRow icon={<Mail className="h-5 w-5" />} label="Email" value={site.contact.email} href={site.contact.emailHref} />
+            <ContactRow icon={<MapPin className="h-5 w-5" />} label="Address" value={site.address.full} />
+            <div className="flex items-start gap-3">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-primary-50 text-primary-600">
+                <Clock className="h-5 w-5" aria-hidden="true" />
               </span>
-              <div>
-                <p className="font-heading font-semibold text-neutral-900">Visit us</p>
-                <p className="mt-1 text-sm leading-body text-neutral-600">
-                  {clinic.addressLine}
-                </p>
+              <div className="flex-1">
+                <p className="text-body-sm font-semibold text-neutral-800">Clinic Timings</p>
+                <div className="mt-2">
+                  <BusinessHours />
+                </div>
               </div>
-            </li>
-            <li className="flex gap-4">
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary-50 text-primary-600">
-                <Phone aria-hidden="true" className="h-5 w-5" />
-              </span>
-              <div>
-                <p className="font-heading font-semibold text-neutral-900">Call us</p>
-                <a
-                  href={telUrl}
-                  className="mt-1 inline-block text-sm font-medium text-primary-700 hover:underline"
-                >
-                  {clinic.phoneDisplay}
-                </a>
-              </div>
-            </li>
-            <li className="flex gap-4">
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary-50 text-primary-600">
-                <MessageCircle aria-hidden="true" className="h-5 w-5" />
-              </span>
-              <div>
-                <p className="font-heading font-semibold text-neutral-900">WhatsApp</p>
-                <a
-                  href={whatsappUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-1 inline-block text-sm font-medium text-primary-700 hover:underline"
-                >
-                  Chat with us on WhatsApp
-                </a>
-              </div>
-            </li>
-            <li className="flex gap-4">
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary-50 text-primary-600">
-                <Mail aria-hidden="true" className="h-5 w-5" />
-              </span>
-              <div>
-                <p className="font-heading font-semibold text-neutral-900">Email</p>
-                <a
-                  href={`mailto:${clinic.email}`}
-                  className="mt-1 inline-block text-sm font-medium text-primary-700 hover:underline"
-                >
-                  {clinic.email}
-                </a>
-              </div>
-            </li>
-            <li className="flex gap-4">
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary-50 text-primary-600">
-                <Clock aria-hidden="true" className="h-5 w-5" />
-              </span>
-              <div>
-                <p className="font-heading font-semibold text-neutral-900">Clinic hours</p>
-                <p className="mt-1 text-sm leading-body text-neutral-600">
-                  {clinic.hours
-                    ? clinic.hours.map((h) => `${h.days}: ${h.time}`).join(" · ")
-                    : "Please call us for current clinic hours."}
-                </p>
-              </div>
-            </li>
-          </ul>
+            </div>
+          </Card>
+          <GoogleMap />
         </Reveal>
-        <Reveal variant="slide-right">
-          <div className="rounded-card border border-neutral-100 bg-white p-6 shadow-soft md:p-8">
-            <AppointmentForm />
-          </div>
-        </Reveal>
+
+        {withForm && (
+          <Reveal delay={0.1}>
+            <Card variant="premium">
+              <h3 className="mb-5 text-h4">Request an appointment</h3>
+              <AppointmentForm />
+            </Card>
+          </Reveal>
+        )}
       </div>
     </Section>
+  );
+}
+
+function ContactRow({
+  icon,
+  label,
+  value,
+  href,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  href?: string;
+}) {
+  const content = (
+    <div className="flex items-start gap-3">
+      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-primary-50 text-primary-600">{icon}</span>
+      <div>
+        <p className="text-body-sm font-semibold text-neutral-800">{label}</p>
+        <p className="text-body-sm text-neutral-600">{value}</p>
+      </div>
+    </div>
+  );
+  return href ? (
+    <a href={href} className="rounded-lg transition-colors hover:bg-neutral-50">{content}</a>
+  ) : (
+    content
   );
 }

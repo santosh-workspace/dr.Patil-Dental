@@ -1,34 +1,44 @@
-import type { ReactNode } from "react";
+import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 import { Container } from "@/components/layout/Container";
-import { Breadcrumb, type Crumb } from "@/components/ui/Breadcrumb";
+import { Reveal } from "@/components/animations/Reveal";
 
-interface PageHeaderProps {
-  crumbs: Crumb[];
+/** PageHeader — internal-page hero band with breadcrumb + H1 (visible + schema-friendly). */
+export function PageHeader({
+  title,
+  subtitle,
+  crumbs,
+}: {
   title: string;
-  lede?: string;
-  /** Extra content below the lede (badges, CTAs). */
-  children?: ReactNode;
-}
-
-/** Inner-page header: breadcrumb + H1 + lede on the brand's soft gradient. */
-export function PageHeader({ crumbs, title, lede, children }: PageHeaderProps) {
+  subtitle?: string;
+  crumbs: { name: string; path: string }[];
+}) {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-primary-50 via-mint-50/50 to-white">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -top-24 right-[-6%] h-72 w-72 rounded-full bg-primary-100/60 blur-3xl"
-      />
-      <Container className="relative py-12 md:py-16">
-        <Breadcrumb items={crumbs} />
-        <h1 className="font-heading text-4xl font-bold tracking-tight text-neutral-900 md:text-5xl">
-          {title}
-        </h1>
-        {lede && (
-          <p className="mt-4 max-w-2xl text-lg leading-body text-neutral-600">
-            {lede}
-          </p>
-        )}
-        {children}
+    <section className="border-b border-neutral-200 bg-gradient-to-b from-primary-50/70 to-white">
+      <Container className="py-12 md:py-16">
+        <Reveal className="flex flex-col gap-4">
+          <nav aria-label="Breadcrumb">
+            <ol className="flex flex-wrap items-center gap-1.5 text-caption text-neutral-500">
+              {crumbs.map((c, i) => {
+                const last = i === crumbs.length - 1;
+                return (
+                  <li key={c.path} className="flex items-center gap-1.5">
+                    {last ? (
+                      <span aria-current="page" className="font-semibold text-primary-700">{c.name}</span>
+                    ) : (
+                      <>
+                        <Link href={c.path} className="hover:text-primary-700">{c.name}</Link>
+                        <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" />
+                      </>
+                    )}
+                  </li>
+                );
+              })}
+            </ol>
+          </nav>
+          <h1 className="text-h1">{title}</h1>
+          {subtitle && <p className="max-w-2xl text-body-lg text-neutral-600">{subtitle}</p>}
+        </Reveal>
       </Container>
     </section>
   );
